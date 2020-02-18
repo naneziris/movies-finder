@@ -1,5 +1,6 @@
-import React, { useState } from 'react'
+import React, { memo, useState } from 'react'
 import PropTypes from 'prop-types';
+import _isEqual from 'lodash/isEqual';
 import './MovieItem.css';
 import { API_KEY, IMAGE_PATH_BASE } from '../../../config/constants';
 
@@ -12,6 +13,11 @@ const MovieItem = props => {
     const [movieSimilar, setMovieSimilar] = useState([]);
     const yearOfRelease = new Date(release_date).getFullYear() || '';
 
+    /**
+     * Fetch videos, reviews and similar movies
+     * and set them on local state
+     * along with openInfo
+     */
     const handleShowInfo = async (e) => {
         const {id} = e.target.dataset;
         const movieVideosResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}&language=en-US&page=1`);
@@ -27,11 +33,18 @@ const MovieItem = props => {
     }
 
     const CTAlabel = !openInfo ? 'More Info' : 'Hide Info';
+    const itemOpenExtraClass = openInfo ? "open" : '';
+
+    /**
+     * Helper function to construct the youtube video url
+     * with the youtube key we get from the response
+     * @param {string} key 
+     */
     const constructVideoUrl = (key) => {
         return `https://www.youtube.com/embed/${key}?autoplay=0&rel=0`;
     }
     return (
-        <li className="movie">
+        <li className={`movie ${itemOpenExtraClass}`}>
             <div className="movie__container">
                 <div className="movie__media">
                     <img src={`${IMAGE_PATH_BASE}${poster_path}`} alt={title} />
@@ -39,13 +52,13 @@ const MovieItem = props => {
                 <div className="movie__body">
                     <h2 className="movie__title">{title}</h2>
                     <h5 className="movie__date">{yearOfRelease}</h5>
-                    <h5 className="vote__average">{vote_average}</h5>
+                    <h5 className="movie_average">{vote_average}</h5>
                     <h3 className="movie__description">
-                        <span>Description</span>
-                        <i>{overview}</i>
+                        Description
+                        <p>{overview}</p>
                     </h3>
                     <div>{genres}</div>
-                    <button type="button" data-id={id} onClick={handleShowInfo}>{CTAlabel}</button>
+                    <button className="movie__btn" type="button" data-id={id} onClick={handleShowInfo}>{CTAlabel}</button>
                 </div>
             </div>
             {openInfo ?
@@ -105,6 +118,7 @@ const MovieItem = props => {
                         </ul>
                     </>
                     }
+                    <button className="movie__btn" type="button" data-id={id} onClick={handleShowInfo}>{CTAlabel}</button>
                 </div>
             : null}
         </li>
@@ -116,4 +130,11 @@ MovieItem.propTypes = {
     genres: PropTypes.node.isRequired,
 };
 
-export default MovieItem;
+const areEqual = (prevProps, nextProps) => {
+    return (
+        _isEqual(prevProps.movie, nextProps.movie) &&
+        _isEqual(prevProps.genres, nextProps.genres)
+    );
+};
+
+export default memo(MovieItem, areEqual);

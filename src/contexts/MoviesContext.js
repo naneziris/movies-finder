@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useCallback } from 'react';
+import _isEmpty from 'lodash/isEmpty';
 import { MOVIES_IN_THEATER_URL, MOVIES_SEARCH_URL, MOVIES_GENRES_URL } from '../config/constants';
 
 const MoviesContext = React.createContext();
@@ -6,10 +7,10 @@ const MoviesContext = React.createContext();
 const MoviesProvider = (props) => {
 
     const [movies, setMovies] = useState([]);
-    const [page, setPage] = useState([]);
+    const [page, setPage] = useState(1);
     const [totalPages, setTotalPages] = useState([]);
     const [listName, setListName] = useState(['in-theaters']);
-    const [genres, setGenres] = useState([]);
+    const [genres, setGenres] = useState({});
     const [loading, setLoading] = useState(true);
     const [showInTheatersButton, setShowInTheatersButton] = useState(false);
     const [search, setSearch] = useState('');
@@ -18,7 +19,10 @@ const MoviesProvider = (props) => {
      * Fetches a list of all genres
      * Flattens the object and sets it at the Context
      */
-    const fetchGenres = async () => {
+    const fetchGenres = useCallback(async () => {
+        // Genres do not change often, so If we have already fetched them and placed in Context
+        // do not fetch again
+        if (!_isEmpty(genres)) return;
         try {
             const genresData = await fetch(MOVIES_GENRES_URL);
             const genres = await genresData.json();
@@ -28,14 +32,14 @@ const MoviesProvider = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }
+    }, [genres]);
 
     /**
      * Fetches the movies that are "in theater now"
      * Returns array objects
      * @param {number} page 
      */
-    const fetchMovies = async (page = 1) => {
+    const fetchMovies = useCallback( async (page = 1) => {
         try {
             const movieData = await fetch(`${MOVIES_IN_THEATER_URL}&page=${page}`);
             const moviesInTheater = await movieData.json();
@@ -47,7 +51,8 @@ const MoviesProvider = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }
+    }, []);
+
 
     /**
      * Debounce method used for limiting the number of
@@ -72,7 +77,7 @@ const MoviesProvider = (props) => {
      * @param {string} value 
      * @param {*number} page 
      */
-    const handleSearch = async (value, page = 1) => {
+    const handleSearch = useCallback( async (value, page = 1) => {
         if (!value || value === '') {
             setSearch(null);
             return fetchMovies();
@@ -91,7 +96,7 @@ const MoviesProvider = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }
+    }, [fetchMovies]);
 
     /**
      * Fetches the next page of the movies list
@@ -100,7 +105,7 @@ const MoviesProvider = (props) => {
      * Pushes the new movie objects to the existing array of objects in Context
      * @param {number} page 
      */
-    const fetchMoreMovies = async (page = 2) => {
+    const fetchMoreMovies = useCallback( async (page = 2) => {
         let movieData;
         try {
             if(listName === 'search-results') {
@@ -116,14 +121,14 @@ const MoviesProvider = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }
+    }, [listName, movies, search]);
 
-    const debounceHandleSearch = debounce(handleSearch, 900);
+    const debounceHandleSearch = useCallback(debounce(handleSearch, 900), []);
 
     useEffect(() => {
         fetchMovies();
         fetchGenres();
-    }, [])
+    }, [fetchMovies, fetchGenres]);
     
       return (
         <MoviesContext.Provider value={{

@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { useMoviesContext } from '../../../contexts/MoviesContext';
+import _isEqual from 'lodash/isEqual';
 import '../Movies.css';
 
 const MovieSearch = () => {
@@ -26,4 +27,4 @@ const MovieSearch = () => {
     );
 };
 
-export default MovieSearch;
+export default memo(MovieSearch);
