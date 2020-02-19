@@ -96,7 +96,7 @@ const MoviesProvider = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }, [fetchMovies]);
+    }, []);
 
     /**
      * Fetches the next page of the movies list
@@ -128,7 +128,7 @@ const MoviesProvider = (props) => {
     useEffect(() => {
         fetchMovies();
         fetchGenres();
-    }, [fetchMovies, fetchGenres]);
+    }, []);
     
       return (
         <MoviesContext.Provider value={{

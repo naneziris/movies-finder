@@ -7,8 +7,7 @@ import '../Movies.css';
 
 export const MovieList = () => {
     const { movies, loading, page, totalPages, fetchMoreMovies, genres } = useMoviesContext();
-    const emptyResults = movies.length === 0;
-
+    const emptyResults = movies?.length === 0;
 
     const showItemGenres = genresIdsArray => (
         <>

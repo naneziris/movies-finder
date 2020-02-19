@@ -1,9 +1,8 @@
 import React, { memo } from 'react';
 import { useMoviesContext } from '../../../contexts/MoviesContext';
-import _isEqual from 'lodash/isEqual';
 import '../Movies.css';
 
-const MovieSearch = () => {
+export const MovieSearch = () => {
     const { debounceHandleSearch, showInTheatersButton, setShowInTheatersButton, fetchMovies, search, setSearch } = useMoviesContext();
     const inputRef = React.useRef();
     const handleClick = (e) => {

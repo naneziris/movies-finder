@@ -1,0 +1,70 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`MovieList Should match the snapshot 1`] = `
+<div>
+  <ul
+    className="movies-container"
+  >
+    <div>
+      <li
+        className="movie "
+      >
+        <div
+          className="movie__container"
+        >
+          <div
+            className="movie__media"
+          >
+            <img
+              alt="Niko's Movie"
+              src="https://image.tmdb.org/t/p/w500"
+            />
+          </div>
+          <div
+            className="movie__body"
+          >
+            <h2
+              className="movie__title"
+            >
+              Niko's Movie
+            </h2>
+            <h5
+              className="movie__date"
+            >
+              2019
+            </h5>
+            <h5
+              className="movie_average"
+            >
+              10
+            </h5>
+            <h3
+              className="movie__description"
+            >
+              Description
+              <p>
+                Just a movie
+              </p>
+            </h3>
+            <div>
+              <span
+                className="movies__genre"
+              >
+                adventure
+              </span>
+            </div>
+            <button
+              className="movie__btn"
+              data-id={1}
+              onClick={[Function]}
+              type="button"
+            >
+              More Info
+            </button>
+          </div>
+        </div>
+      </li>
+    </div>
+  </ul>
+</div>
+`;
