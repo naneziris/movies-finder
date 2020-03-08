@@ -80,10 +80,11 @@ const MoviesProvider = (props) => {
     const handleSearch = useCallback( async (value, page = 1) => {
         if (!value || value === '') {
             setSearch(null);
+            setShowInTheatersButton(false);
             return fetchMovies();
         }
+        setLoading(true);
         try {
-            setLoading(true);
             const response = await fetch(`${MOVIES_SEARCH_URL}&query=${value}&page=${page}`);
             const searchRelatedMovies = await response.json();
             setMovies(searchRelatedMovies.results);
@@ -96,7 +97,7 @@ const MoviesProvider = (props) => {
         } catch (e) {
             console.log(e);
         }
-    }, []);
+    }, [fetchMovies]);
 
     /**
      * Fetches the next page of the movies list
@@ -128,7 +129,7 @@ const MoviesProvider = (props) => {
     useEffect(() => {
         fetchMovies();
         fetchGenres();
-    }, []);
+    }, [fetchMovies, fetchGenres]);
     
       return (
         <MoviesContext.Provider value={{

@@ -1,6 +1,5 @@
 import React, { memo, useState } from 'react'
 import PropTypes from 'prop-types';
-import _isEqual from 'lodash/isEqual';
 import './MovieItem.css';
 import { API_KEY, IMAGE_PATH_BASE } from '../../../config/constants';
 
@@ -19,13 +18,20 @@ const MovieItem = props => {
      * along with openInfo
      */
     const handleShowInfo = async (e) => {
+        if(openInfo) {
+            return setOpenInfo(!openInfo);
+        }
         const {id} = e.target.dataset;
-        const movieVideosResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}&language=en-US&page=1`);
-        const movieVideos = await movieVideosResponse.json();
-        const movieReviewsResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}/reviews?api_key=${API_KEY}&language=en-US&page=1`);
-        const movieReviews = await movieReviewsResponse.json();
-        const movieSimilarResponse = await fetch(`https://api.themoviedb.org/3/movie/${id}/similar?api_key=${API_KEY}&language=en-US&page=1`);
-        const movieSimilar = await movieSimilarResponse.json();
+        const movieVideosResponse = fetch(`https://api.themoviedb.org/3/movie/${id}/videos?api_key=${API_KEY}&language=en-US&page=1`);
+        const movieReviewsResponse = fetch(`https://api.themoviedb.org/3/movie/${id}/reviews?api_key=${API_KEY}&language=en-US&page=1`);
+        const movieSimilarResponse = fetch(`https://api.themoviedb.org/3/movie/${id}/similar?api_key=${API_KEY}&language=en-US&page=1`);
+        const [movieVideos, movieReviews, movieSimilar] = await Promise.all(
+            [
+                movieVideosResponse.then(res => res.json()),
+                movieReviewsResponse.then(res => res.json()),
+                movieSimilarResponse.then(res => res.json()),
+            ]
+            );
         setMovieVideos(movieVideos.results);
         setMovieReviews(movieReviews.results);
         setMovieSimilar(movieSimilar.results);
@@ -130,11 +136,5 @@ MovieItem.propTypes = {
     genres: PropTypes.node.isRequired,
 };
 
-const areEqual = (prevProps, nextProps) => {
-    return (
-        _isEqual(prevProps.movie, nextProps.movie) &&
-        _isEqual(prevProps.genres, nextProps.genres)
-    );
-};
 
-export default memo(MovieItem, areEqual);
+export default memo(MovieItem);
